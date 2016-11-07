@@ -1,0 +1,21 @@
+#!/bin/bash
+
+#用户登录时触发
+#/etc/profile
+#bash /sh/monitor/welcome
+
+#login weixin notice
+
+WhiteIP='220.113.66.46'
+
+SEND="/sh/business/send.py"
+IP=`who am i|sed -e 's/[()]//g'|awk '{print $5}'`
+
+[ "$IP" == "" ] && echo 'welcome to plpcm server ^_^' && exit 0
+
+echo $WhiteIP|grep $IP >/dev/null
+if [ $? -eq 0 ] ;then
+    exit 0
+fi
+LIP=`/sbin/ifconfig eth1 | grep "inet addr" | cut -f 2 -d ":" | cut -f 1 -d " "`
+$SEND weixin "NOTICE_SERVER" $LIP"_login_warning" "`who am i|sed -e 's/[()]//g'|awk '{print $1"_"$5}'`_$(curl -s 'http://int.dpool.sina.com.cn/iplookup/iplookup.php?format=json&ip='$IP|cut -d, -f6|iconv -f JAVA 	-t utf-8|cut -d: -f2|sed s/\"//g)"  &
